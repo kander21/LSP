@@ -58,11 +58,11 @@ int main(int argc, char **argv) {
     	}
     	return -1;
     }
-	else{
-    	FindFile(argv[1], argv[2]);
-    	if(!found){
-            printf("File not found!\n");
-    	}
+    else{
+	FindFile(argv[1], argv[2]);
+	if(!found){
+	    printf("File not found!\n");
 	}
-	return 0;
+    }
+    return 0;
 }
