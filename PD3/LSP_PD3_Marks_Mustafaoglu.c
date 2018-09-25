@@ -8,37 +8,40 @@
 #include <dirent.h>
 
 
-bool found = false; 
+bool found = false;
+char finalPath[256];
 
-char * FindFile(char *filename, char *directory){
+void FindFile(char *filename, char *directory){
 
 	char *path = malloc(256);
+	char * tmpPath = malloc(256);
+	path[0] = '\0';
 	strcat(path, directory);
 
 	DIR *d;
 	struct  dirent  *de;
-	d  =  opendir(path);
-	if(d  !=  NULL){
+	d = opendir(path);
+	if(d != NULL){
 		while((de = readdir(d)) != NULL){
-			printf("Function");
+            tmpPath[0] = '\0';
+            strcat(tmpPath,path);
+            strcat(tmpPath,"\\");
+            strcat(tmpPath,de->d_name);
+
 			struct stat buf;
-    		stat(path,&buf);
+    		stat(tmpPath,&buf);
 
 			if(strcmp(de->d_name, filename) == 0 && S_ISREG(buf.st_mode)){
-				strcat(path,filename);
 				found = true;
-				printf("FOUND FILE");
-				return path;
-			}
+				printf("%s\n", tmpPath);
 
-			//printf("%s\n", de->d_name);
-			if(!S_ISDIR(buf.st_mode)){
-				return FindFile(filename, strcat(path,de->d_name));
+			}
+			if(S_ISDIR(buf.st_mode) && strcmp(de->d_name, ".") && strcmp(de->d_name, "..")){
+                FindFile(filename, tmpPath);
 			}
 		}
 		closedir(d);
 	}
-	return path;
 }
 
 int main(int argc, char **argv) {
@@ -54,38 +57,12 @@ int main(int argc, char **argv) {
     		printf("Second argument is not directory!");
     	}
     	return -1;
-
     }
 	else{
-		char *path = malloc(256);
-    	path = FindFile(argv[1], argv[2]);
-    	printf("%s\n", path);
-		//path = 0;
+    	FindFile(argv[1], argv[2]);
+    	if(!found){
+            printf("File not found!\n");
+    	}
 	}
 	return 0;
 }
-
-// #include <stdio.h> 
-// #include <dirent.h> 
-  
-// int main(void) 
-// { 
-//     struct dirent *de;  // Pointer for directory entry 
-  
-//     // opendir() returns a pointer of DIR type.  
-//     DIR *dr = opendir("/usr/bin"); 
-  
-//     if (dr == NULL)  // opendir returns NULL if couldn't open directory 
-//     { 
-//         printf("Could not open current directory" ); 
-//         return 0; 
-//     } 
-  
-//     // Refer http://pubs.opengroup.org/onlinepubs/7990989775/xsh/readdir.html 
-//     // for readdir() 
-//     while ((de = readdir(dr)) != NULL) 
-//             printf("%s\n", de->d_name); 
-  
-//     closedir(dr);     
-//     return 0; 
-// } 
